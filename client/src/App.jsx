@@ -17,7 +17,7 @@ const socket = io();
       recargarMsj(chats)
     })
       console.log(mensaje)  
-  });  
+  },[mensaje]);  
   
   function Envio(e) {
     e.preventDefault();
@@ -27,15 +27,15 @@ const socket = io();
   }
 
   return (
-    <div className="App">
-      <form onSubmit={Envio}>
-        <input type={'text'} ref={myRef} onChange={(e) => {inMensaje({...mensaje, usuario : e.target.value})}} />
-        <input type={'text'} onChange={(e) => {inMensaje({...mensaje, mensaje : e.target.value})}}/>
-        <button>Enviar</button>
-      </form>
+    <div className="h-screen bg-slate-800 text-white" >
       {cargarMsj.map((cargarMsj,i) => {
         return <Mensajes key={i} msj = {cargarMsj}/>
       })}
+      <form onSubmit={Envio} className="h-20 w-screen flex flex-col justify-center items-center">
+        <input type={'text'} ref={myRef} onChange={(e) => {inMensaje({...mensaje, usuario : e.target.value})}} className="w-40" />
+        <input type={'text'} onChange={(e) => {inMensaje({...mensaje, mensaje : e.target.value})}} className="w-40"/>
+        <button className="w-40">Enviar</button>
+      </form>
     </div>
   )
 }
