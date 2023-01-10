@@ -8,5 +8,6 @@ export const connectDB = () => {
         console.log('conectando a db')
     } catch (error) {
         console.log(error)
+        console.log('Algo anda mal')
     }
 }
