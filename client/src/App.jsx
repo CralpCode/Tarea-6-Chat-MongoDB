@@ -1,13 +1,13 @@
 import './App.css'
 import { io } from "socket.io-client";
 import { useState, useEffect, useRef } from 'react';
-import {Mensajes} from './components/Mensajes'
-import {default as chatMongo} from './assets/chatMongo.png'
-const socket = io();
+import { Mensajes } from './components/Mensajes'
+import { default as chatMongo } from './assets/chatMongo.png'
+const socket = io(import.meta.env.VITE_API_URL || undefined);
 
-  
-  function App() {
-    
+
+function App() {
+
   const refIn = useRef();
   const refLab = useRef();
   const refChat = useRef();
@@ -17,47 +17,47 @@ const socket = io();
   const refTxt = useRef();
   const refMens = useRef();
   const [mensaje, inMensaje] = useState({});
-  const [usuario,nuevUsuario] =useState('');
-  const [cargarMsj,recargarMsj] = useState([]);
-  const [valor, inValor]= useState(false);
+  const [usuario, nuevUsuario] = useState('');
+  const [cargarMsj, recargarMsj] = useState([]);
+  const [valor, inValor] = useState(false);
 
   useEffect(() => {
     try {
-        socket.on("server:cargarchat", (chats) => {
+      socket.on("server:cargarchat", (chats) => {
         recargarMsj(chats)
         console.log('cargando chats')
       })
     } catch (error) {
-        console.log(error)
+      console.log(error)
     }
     refChat.current.scrollTop = refChat.current.scrollHeight;
-  },[mensaje]);  
+  }, [mensaje]);
 
   useEffect(() => {
-    refChat.current.style.display ='none' 
-  },[]);
-   
+    refChat.current.style.display = 'none'
+  }, []);
+
   useEffect(() => {
     refChat.current.scrollTop = refChat.current.scrollHeight;
   });
-  
+
   function Envio(e) {
-    e.preventDefault();     
+    e.preventDefault();
     console.log(mensaje)
     if (mensaje.usuario === '' || mensaje.mensaje === '' || Object.entries(mensaje).length < 2 || valor === false) {
       recargarMsj(cargarMsj)
       return alert('No deje espacios vacios')
     }
-    else{      
-      inMensaje({...mensaje,usuario})
+    else {
+      inMensaje({ ...mensaje, usuario })
       inValor(true)
-      recargarMsj([...cargarMsj, { usuario: usuario, mensaje: mensaje.mensaje}])
+      recargarMsj([...cargarMsj, { usuario: usuario, mensaje: mensaje.mensaje }])
       console.log(mensaje)
-      socket.emit('cliente:guardarchat', { usuario: usuario, mensaje: mensaje.mensaje});
+      socket.emit('cliente:guardarchat', { usuario: usuario, mensaje: mensaje.mensaje });
       cambiarEstilo()
-      inMensaje({...mensaje,mensaje:''})
+      inMensaje({ ...mensaje, mensaje: '' })
     }
-    
+
   }
 
   function cambiarEstilo() {
@@ -67,8 +67,8 @@ const socket = io();
     refImg.current.style.display = 'none';
     refChat.current.style.display = 'flex';
     refEnv.current.style.flexDirection = 'row';
-    refEnv.current.style.alingItems= 'flex-end'
-    refEnv.current.style.justifyContent= 'space-between'
+    refEnv.current.style.alignItems = 'flex-end'
+    refEnv.current.style.justifyContent = 'space-between'
     refEnv.current.style.width = '92%';
     refEnv.current.style.height = '40px';
     refTxt.current.style.width = '85%';
@@ -79,30 +79,30 @@ const socket = io();
 
   return (
     <div className="h-screen bg-slate-800 text-white flex flex-col justify-center items-center" >
-      <input type={'image'} src={chatMongo} ref={refImg} className='rounded-lg w-80'/>
+      <input type={'image'} src={chatMongo} ref={refImg} className='rounded-lg w-80' />
       <div className='flex flex-col w-11/12 h-4/5 overflow-auto ' ref={refChat} >
-            { 
-             cargarMsj.map((cargarMsj,i) => {
-              if (valor) {
-                return(<Mensajes key={i} msj = {cargarMsj}/> )
-              }
-              })
+        {
+          cargarMsj.map((cargarMsj, i) => {
+            if (valor) {
+              return (<Mensajes key={i} msj={cargarMsj} />)
             }
-      </div> 
+          })
+        }
+      </div>
       <form onSubmit={Envio} className="h-32  w-44 flex flex-col justify-center items-center mt-2" ref={refEnv}>
         <label ref={refLab} className='self-start'>Usuario</label>
         <input type={'text'} ref={refIn} onChange={(e) => {
-          nuevUsuario( e.target.value)
-          inMensaje({...mensaje, usuario})
-        }} className="text-black rounded-lg"  />
+          nuevUsuario(e.target.value)
+          inMensaje({ ...mensaje, usuario })
+        }} className="text-black rounded-lg" />
         <label className='self-start' ref={refMens}>Mensaje</label>
         <input type={'text'} onChange={(e) => {
           inMensaje({
-          ...mensaje,
-           mensaje : e.target.value
-        })
+            ...mensaje,
+            mensaje: e.target.value
+          })
           inValor(true)
-      }} className="text-black rounded-lg" ref={refTxt}/>
+        }} className="text-black rounded-lg" ref={refTxt} />
         <button className="mt-2 w-44  bg-slate-600 rounded-lg" ref={refBtn}>Enviar</button>
       </form>
     </div>
